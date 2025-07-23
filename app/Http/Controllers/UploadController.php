@@ -106,19 +106,19 @@ class UploadController extends Controller
 
             if ($validated['type'] == 'دبلوم تقنية الأجهزة الطبية') {
                 $this->upload($validated['bmt_certificate'], $validated['nationalID'], $validated['email'], 'bmt_certificate', $user->id);
-                $this->upload($validated['bmt_transcript'], $validated['nationalID'], $validated['email'],'bmt_transcript', $user->id);
-                $this->upload($validated['bmt_high_school_certificate'], $validated['nationalID'], $validated['email'],'bmt_high_school_certificate', $user->id);
-                $this->upload($validated['bmt_sce'], $validated['nationalID'], $validated['email'],'bmt_sce', $user->id);
-                $this->upload($validated['bmt_language'], $validated['nationalID'], $validated['email'],'bmt_language', $user->id);
+                $this->upload($validated['bmt_transcript'], $validated['nationalID'], $validated['email'], 'bmt_transcript', $user->id);
+                $this->upload($validated['bmt_high_school_certificate'], $validated['nationalID'], $validated['email'], 'bmt_high_school_certificate', $user->id);
+                $this->upload($validated['bmt_sce'], $validated['nationalID'], $validated['email'], 'bmt_sce', $user->id);
+                $this->upload($validated['bmt_language'], $validated['nationalID'], $validated['email'], 'bmt_language', $user->id);
             } else if ($validated['type'] == 'الدبومات الاخرى') {
-                $this->upload($validated['other_high_school_certificate'], $validated['nationalID'], $validated['email'],'other_high_school_certificate', $user->id);
-                $this->upload($validated['other_aptitudes_certificate'], $validated['nationalID'], $validated['email'],'other_aptitudes_certificate', $user->id);
-                $this->upload($validated['other_achievement_certificate'], $validated['nationalID'], $validated['email'],'other_achievement_certificate', $user->id);
-                $this->upload($validated['other_tramscript_certificate'], $validated['nationalID'], $validated['email'],'other_tramscript_certificate', $user->id);
+                $this->upload($validated['other_high_school_certificate'], $validated['nationalID'], $validated['email'], 'other_high_school_certificate', $user->id);
+                $this->upload($validated['other_aptitudes_certificate'], $validated['nationalID'], $validated['email'], 'other_aptitudes_certificate', $user->id);
+                $this->upload($validated['other_achievement_certificate'], $validated['nationalID'], $validated['email'], 'other_achievement_certificate', $user->id);
+                $this->upload($validated['other_tramscript_certificate'], $validated['nationalID'], $validated['email'], 'other_tramscript_certificate', $user->id);
             } else if ($validated['type'] == 'ثانوي') {
-                $this->upload($validated['high_school_certificate'], $validated['nationalID'], $validated['email'],'high_school_certificate', $user->id);
-                $this->upload($validated['high_school_aptitudes'], $validated['nationalID'], $validated['email'],'high_school_aptitudes', $user->id);
-                $this->upload($validated['high_school_achievement'], $validated['nationalID'], $validated['email'],'high_school_achievement', $user->id);
+                $this->upload($validated['high_school_certificate'], $validated['nationalID'], $validated['email'], 'high_school_certificate', $user->id);
+                $this->upload($validated['high_school_aptitudes'], $validated['nationalID'], $validated['email'], 'high_school_aptitudes', $user->id);
+                $this->upload($validated['high_school_achievement'], $validated['nationalID'], $validated['email'], 'high_school_achievement', $user->id);
             }
         });
 
@@ -126,10 +126,10 @@ class UploadController extends Controller
 
     }
 
-    private function upload($file, $id, $email ,$type, $user_id): void
+    private function upload($file, $id, $email, $type, $user_id): void
     {
         $extention = $file->getClientOriginalExtension();
-        $fileName = $id . '|' . $email .  '|'  . $type . '.' . $extention;
+        $fileName = $id . '|' . $email . '|' . $type . '.' . $extention;
         $path = $file->storePubliclyAs($fileName);
         Attachment::create([
             'user_id' => $user_id,
@@ -139,6 +139,21 @@ class UploadController extends Controller
 
     public function download(Request $request)
     {
-        return Storage::download($request->file);
+        return Storage::download($request->link);
+    }
+
+    public function admin()
+    {
+        return view('admin', [
+            'users' => User::with('attachments')->get()
+        ]);
+    }
+
+    public function readbleName($string)
+    {
+        $parts = explode('|', $string);
+        $filename = $parts[2];
+        $filenameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
+        return str_replace('_', ' ', $filenameWithoutExt);
     }
 }
