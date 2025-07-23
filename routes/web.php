@@ -6,4 +6,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [UploadController::class, 'index']);
 
 Route::post('/upload', [UploadController::class, 'store'])->name('upload');
-    
+
+Route::post('/download', [UploadController::class, 'download'])->name('download');
